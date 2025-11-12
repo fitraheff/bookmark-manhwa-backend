@@ -2,7 +2,8 @@ const joi = require('joi')
 
 const createManhwaValidation = joi.object({
     title: joi.string().min(3).required(),
-    cover_image: joi.string().uri().required(),
+    cover_image: joi.string().uri().optional(),
+    desc: joi.string().optional()
 })
 
 const updateManhwaValidation = joi.object({

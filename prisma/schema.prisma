@@ -9,13 +9,28 @@ datasource db {
 
 model Manhwa {
   id          String    @id @default(uuid()) 
-  title       String    @unique @db.VarChar(250)  
-  cover_image String?   @db.VarChar(250)
+  title       String    @unique @db.VarChar(250)
+  desc        String?   @db.Text  
+  coverImage  String?   @db.Text
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   @@index([title])
-  @@index([id])
 
   @@map("manhwa")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  username  String    @unique @db.VarChar(100)
+  email     String    @unique @db.VarChar(255)
+  password  String    @db.VarChar(100)
+  role      Role
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  bookmarks Bookmark[] 
+  refreshTokens RefreshToken[]
+
+  @@map("users")
 }
