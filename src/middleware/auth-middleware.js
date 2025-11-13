@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const prisma = require('../utils/database')
 const ResponseError = require('../utils/response-error')
 
-export const authMiddleware = async (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -38,7 +38,7 @@ export const authMiddleware = async (req, res, next) => {
     }
 };
 
-export const authAdminMiddleware = async (req, res, next) => {
+const authAdminMiddleware = async (req, res, next) => {
     // Pastikan user sudah terotentikasi
     if (!['ADMIN', 'SUPERADMIN'].includes(req.user.role)) {
         return next(new ResponseError(403, "Forbidden: Admin or Superadmin only"));
@@ -47,9 +47,11 @@ export const authAdminMiddleware = async (req, res, next) => {
 };
 
 // Middleware untuk SUPERADMIN-only
-export const authSuperadminMiddleware = (req, res, next) => {
+const authSuperadminMiddleware = (req, res, next) => {
     if (!req.user || req.user.role !== 'SUPERADMIN') {
         return next(new ResponseError(403, "Forbidden"));
     }
     next();
 };
+
+module.exports = { authMiddleware, authAdminMiddleware, authSuperadminMiddleware };

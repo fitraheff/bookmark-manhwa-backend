@@ -1,5 +1,5 @@
-const prisma = require('../config/utils')
-const ResponseError = require('../config/response-error')
+const prisma = require('../utils/database')
+const ResponseError = require('../utils/response-error');
 const { validate } = require('../validations/validation')
 const {
     createManhwaValidation,
@@ -28,19 +28,24 @@ const getAllManhwa = async (req, res) => {
 
 const addManhwa = async (req, res) => {
     try {
-        validate(createManhwaValidation, req.body)
+        validate(createManhwaValidation, req.body);
 
-        await manhwaExists(req.body.title)
+        await manhwaExists(req.body.title);
 
         const manhwa = await prisma.manhwa.create({
-            data: req.body
-        })
+            data: {
+                title: req.body.title,
+                desc: req.body.desc,
+                coverImage: req.body.cover_image || req.body.coverImage // ← mapping
+            }
+        });
 
-        return res.json(manhwa)
+        return res.json(manhwa);
     } catch (error) {
-        throw new ResponseError(401, error.message)
+        // 400 = Bad Request, 401 = Unauthorized
+        throw new ResponseError(400, error.message);
     }
-}
+};
 
 const getManhwa = async (req, res) => {
     try {
@@ -66,7 +71,11 @@ const updateManhwa = async (req, res) => {
             where: {
                 id: req.params.id
             },
-            data: req.body
+            data: {
+                title: req.body.title,
+                desc: req.body.desc,
+                coverImage: req.body.coverImage
+            }
         })
         return res.json(manhwa)
     } catch (error) {

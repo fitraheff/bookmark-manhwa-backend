@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-export const generateAccessToken = (user) => {
+const generateAccessToken = (user) => {
     return jwt.sign(
         { userId: user.id, role: user.role },
         process.env.ACCESS_TOKEN_SECRET,
@@ -8,7 +8,7 @@ export const generateAccessToken = (user) => {
     );
 };
 
-export const generateRefreshToken = (user) => {
+const generateRefreshToken = (user) => {
     return jwt.sign(
         { userId: user.id },
         process.env.REFRESH_TOKEN_SECRET,
@@ -16,10 +16,12 @@ export const generateRefreshToken = (user) => {
     );
 };
 
-export const verifyRefreshToken = (refreshToken) => {
-    try {
-        return jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-    } catch (error) {
-        throw new ResponseError(401, "Invalid refresh token");
-    }
-};
+// const verifyRefreshToken = (refreshToken) => {
+//     try {
+//         return jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+//     } catch (error) {
+//         throw new ResponseError(401, "Invalid refresh token");
+//     }
+// };
+
+module.exports = { generateAccessToken, generateRefreshToken };

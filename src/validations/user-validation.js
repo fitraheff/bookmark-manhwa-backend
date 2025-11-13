@@ -4,7 +4,7 @@ const registerUserValidation = Joi.object({
     username: Joi.string().min(3).required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
-    role: Joi.string().valid('ADMIN', 'USER', 'SUPERADMIN').default('USER'), 
+    // role: Joi.string().valid('ADMIN', 'USER', 'SUPERADMIN').default('USER'), 
 })
 
 const loginUserValidation = Joi.object({
@@ -22,8 +22,14 @@ const updateUserValidation = Joi.object({
     }),
 })
 
+const updateUserRoleValidation = Joi.object({
+    // id: Joi.string().uuid().required(), // UUID untuk id
+    role: Joi.string().valid('ADMIN', 'USER', 'SUPERADMIN').required(), // Role wajib
+})
+
 module.exports = {
     registerUserValidation,
     loginUserValidation,
-    updateUserValidation
+    updateUserValidation,
+    updateUserRoleValidation
 }
