@@ -8,6 +8,7 @@ const createManhwaValidation = joi.object({
 
 const updateManhwaValidation = joi.object({
     title: joi.string().min(3).optional(),
+    desc: joi.string().optional(),
     coverImage: joi.string().uri().optional(),
 })
 

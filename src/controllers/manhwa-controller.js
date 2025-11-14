@@ -66,7 +66,7 @@ const getManhwa = async (req, res) => {
 const updateManhwa = async (req, res) => {
     try {
         validate(updateManhwaValidation, req.body)
-        manhwaExists(req.body.title)
+        // manhwaExists(req.body.title)
         const manhwa = await prisma.manhwa.update({
             where: {
                 id: req.params.id
