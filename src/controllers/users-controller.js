@@ -6,7 +6,8 @@ const { validate } = require('../validations/validation')
 const {
     registerUserValidation,
     loginUserValidation,
-    updateUserValidation
+    updateUserValidation,
+    updateUserRoleValidation
 } = require('../validations/user-validation')
 
 const registerUser = async (req, res) => {
@@ -90,7 +91,7 @@ const getUser = async (req, res) => {
         if (req.user.id !== req.params.id) {
             throw new ResponseError(403, 'Forbidden')
         }
-        
+
         const user = await prisma.user.findUnique({
             where: {
                 id: req.params.id
@@ -108,28 +109,100 @@ const getUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        const data = validate(updateUserValidation, req.body)
+        const userId = req.params.id;
 
-        if (req.user.id !== req.params.id) {
-            throw new ResponseError(403, 'Forbidden')
+        // Hanya user itu sendiri
+        if (req.user.id !== userId) {
+            throw new ResponseError(403, "Forbidden");
         }
 
-        const user = await prisma.user.update({
-            where: {
-                id: req.params.id
-            },
-            data
-        })
+        const body = validate(updateUserValidation, req.body);
 
-        if (!user) {
-            throw new ResponseError(404, 'User not found')
+        // Ambil user dari DB (bukan dari JWT)
+        const existingUser = await prisma.user.findUnique({
+            where: { id: userId }
+        });
+
+        if (!existingUser) {
+            throw new ResponseError(404, "User not found");
         }
 
-        return res.json(user)
+        // Field yang boleh diupdate (whitelisting)
+        const updateData = {};
+
+        if (body.username) updateData.username = body.username;
+        if (body.email) updateData.email = body.email;
+
+        if (body.password) {
+            const isPasswordValid = await bcrypt.compare(
+                body.currentPassword,
+                existingUser.password
+            );
+
+            if (!isPasswordValid) {
+                throw new ResponseError(401, "Invalid current password");
+            }
+
+            updateData.password = await bcrypt.hash(body.password, 10);
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: updateData,
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                // role: true,
+                updatedAt: true
+            }
+        });
+
+        return res.json(updatedUser);
     } catch (error) {
         throw new ResponseError(500, error.message)
     }
 }
+
+// controllers/userController.js
+const updateUserRole = async (req, res) => {
+    try {
+        const { role } = validate(updateUserRoleValidation, req.body);
+        const { id: userId } = req.params;
+
+        // superadmin tidak boleh ubah role dirinya sendiri
+        if (req.user.id === userId) {
+            throw new ResponseError(400, "You cannot modify your own role");
+        }
+
+        const User = await prisma.user.findUnique({
+            where: { id: userId }
+        });
+
+        if (!User) {
+            throw new ResponseError(404, "User not found");
+        }
+
+        const updated = await prisma.user.update({
+            where: { id: userId },
+            data: { role },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                role: true,
+                updatedAt: true
+            }
+        });
+
+        const { password, ...safeUser } = updated;
+        return res.json(safeUser);
+
+    } catch (error) {
+        // console.error(error);
+        throw new ResponseError(500, error.message);
+    }
+};
 
 const deleteUser = async (req, res) => {
     try {
@@ -150,5 +223,6 @@ module.exports = {
     getAllUsers,
     getUser,
     updateUser,
+    updateUserRole,
     deleteUser
 }

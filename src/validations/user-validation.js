@@ -24,7 +24,7 @@ const updateUserValidation = Joi.object({
 
 const updateUserRoleValidation = Joi.object({
     // id: Joi.string().uuid().required(), // UUID untuk id
-    role: Joi.string().valid('ADMIN', 'USER', 'SUPERADMIN').required(), // Role wajib
+    role: Joi.string().valid('ADMIN', 'USER').required(), // Role wajib
 })
 
 module.exports = {
