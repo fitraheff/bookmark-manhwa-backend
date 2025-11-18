@@ -7,6 +7,7 @@ const errorMiddleware = require('./middleware/error-middleware')
 
 const manhwaRouter = require('./routers/manhwa-router')
 const usersRouter = require('./routers/users-router')
+const bookmarkRouter = require('./routers/bookmark-router')
 
 app.use(cors({
     origin: 'http://localhost:5173'
@@ -16,6 +17,7 @@ app.use(express.json())
 
 app.use('/api/users', usersRouter)
 app.use('/api/manhwa', manhwaRouter)
+app.use('/api/bookmarks', bookmarkRouter)
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
