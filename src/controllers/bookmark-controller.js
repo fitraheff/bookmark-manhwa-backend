@@ -1,6 +1,6 @@
 // bookmark.js
 const prisma = require("../utils/database");
-const ResponseError = require("../utils/response-error"); // ResponseError = require("../utils/response-error"); // ResponseError = require("../utils/response-error");
+const ResponseError = require("../utils/response-error"); 
 const { validate } = require("../validations/validation");
 const {
     bookmarkSchema,
@@ -27,7 +27,6 @@ const findBookmarkById = (bookmarkId, userId) => {
 // =====================================
 
 const addBookmark = async (req, res, next) => {
-    console.log("ResponseError loaded:", ResponseError);
 
     try {
         const userId = req.user.id; // Ambil dari token
@@ -108,11 +107,6 @@ const updateBookmark = async (req, res, next) => {
         const userId = req.user.id;
         const bookmarkId = req.params.id;
 
-        // const { chapter } = validate(updateBookmarkValidation, {
-        //     manhwaId,
-        //     ...req.body,
-        // });
-
         const { chapter } = validate(updateBookmarkValidation, req.body);
 
         const existing = await findBookmarkById(bookmarkId, userId);
@@ -153,9 +147,6 @@ const deleteBookmark = async (req, res, next) => {
     }
 };
 
-// =====================================
-// EXPORT
-// =====================================
 module.exports = {
     addBookmark,
     getBookmarks,
